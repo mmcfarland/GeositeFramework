@@ -65,6 +65,8 @@ define([
                 // Only mixin the params if they're initially supplied by the framework
                 var self = this;
 
+                console.debug('initialize');
+
                 if (frameworkParameters) {
                     declare.safeMixin(this, frameworkParameters);
                 }
@@ -100,13 +102,28 @@ define([
             },
 
             activate: function (activeSubregion) {
+                console.debug('activate');
+
+                // This shoudn't be necessary.  With the state set, redisplaying
+                // the ui should, and has previously, done the trick.  However, a
+                // persistent error keeps popping up where saveCode scenarios don't
+                // have the tree checked, even though it is expanded and the layer
+                // is actually loaded.  Re-initializing is a sort of scorched earth
+                // approach that allows it to always work at the expense of a longer
+                // load time each time the plugin is activated.
+                this.initialize();
+
+                // The previously working code as-is:
+                /*
                 if (!_.isEmpty(this._currentState) && !activeSubregion) {
                     this._layerManager.setServiceState(this._currentState, this.map);
                 }
                 this._ui.display();
+                */
             },
 
             deactivate: function () {
+                console.debug('deactivate');
                 this._ui.hideAll();
                 this._currentState = this._layerManager.getServiceState();
             },
@@ -132,6 +149,7 @@ define([
             },
 
             clearAll: function () {
+                console.debug('clear');
                 if (! this._ui || ! this._ui.isRendered()) {
                     return;
                 }
