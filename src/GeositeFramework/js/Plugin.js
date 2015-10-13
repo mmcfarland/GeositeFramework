@@ -404,14 +404,19 @@ require(['use!Geosite',
                 .find('.plugin-print').on('click', function() {
                     var pluginDeferred = $.Deferred(),
                         parseDeferred = $.Deferred(),
+                        previewDeferred = $.Deferred(),
                         pluginCssPath = model.get('pluginSrcFolder') + '/print.css',
                         printCssClass = 'plugin-print-css',
                         oppositePaneHideCssPath = 'css/print-hide-map' +
-                            (paneNumber === 0 ? 1 : 0) + '.css';
-
-                    // Any previous plugin-prints may have left their print CSS loaded
-                    // clear them and any pane hiding css prior to this new print operation
+                        (paneNumber === 0 ? 1 : 0) + '.css',
+                        $printSandbox = $('#plugin-print-sandbox'),
+                        previewMap = null;
+                    
+                    // Any previous plugin-prints may have left specific print css
+                    // or sandbox elements.  Clear all so that this new print routine
+                    // has no conflicts with other plugins.
                     $('.' + printCssClass).remove();
+                    $printSandbox.empty();
 
                     // Add the plugin css
                     addCss(pluginCssPath, printCssClass);
@@ -424,9 +429,24 @@ require(['use!Geosite',
                     // not be present and print features wouldn't show up.
                     _.delay(parseDeferred.resolve, 200);
 
-                    pluginObject.beforePrint(pluginDeferred);
+                    // If the plugin is not using the preview map, don't wait for 
+                    // the second-print command
+                    if (!pluginObject.usePrintPreviewMap) {
+                        previewDeferred.resolve();
+                    } else {
+                        previewMap = setupPrintableMap(pluginObject.toolbarName,
+                                        $printSandbox, previewDeferred);
+                    }
 
-                    $.when(pluginDeferred, parseDeferred).then(function() {
+                    // The plugin is given a deferred object to resolve when the page is ready
+                    // to be printed, a reference to an element where it can place printable
+                    // elements outside of its container and a reference to an esriMap which
+                    // is used as a print preview box.
+                    pluginObject.beforePrint(pluginDeferred, $printSandbox, previewMap);
+
+                    // Exectue the browser print when the plugin and print preview (if used)
+                    // have responded, as well as a slight delay for css parsing.
+                    $.when(pluginDeferred, parseDeferred, previewDeferred).then(function() {
                         window.print();
                     });
                 }).end()
@@ -444,6 +464,32 @@ require(['use!Geosite',
 
             // Tell the model about $uiContainer so it can pass it to the plugin object
             model.set('$uiContainer', $uiContainer);
+        }
+
+        function setupPrintableMap(pluginName, $printArea, previewDeferred) {
+            var mapMarkup = N.app.templates['template-map-preview']({ pluginName: pluginName }),
+                $mapPrint= $($.trim(mapMarkup)),
+                $printPreview = $('#print-preview-sandbox');
+
+            // Setup a print-preview window for the user to select and extent and zoom level
+            // that will be persisted at print due to its fixed size.
+            $mapPrint.css({ height: 500, width: 500 });
+            $printPreview
+                .empty()
+                .append($mapPrint)
+                .show();
+
+            var map = new esri.Map('plugin-print-preview-map', { basemap: 'topo' });
+
+            $('#print-preview-print').on('click', function() {
+                // Move the map from the print preview dialog to the sandbox where
+                // the plugin can mess with it's positioning among its other elements
+                $(map.container).detach().appendTo($printArea);
+                $printPreview.hide();
+                previewDeferred.resolve();
+            });
+
+            return map;
         }
 
         function addCss(path, className) {

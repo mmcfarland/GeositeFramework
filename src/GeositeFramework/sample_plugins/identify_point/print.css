@@ -2,7 +2,11 @@
     #sample-graphic-print {
         visibility: visible;
         position: absolute;
-        left: 10px;
+        left: 500px;
         top: 10px;
     }    
+
+    #plugin-print-preview-map {
+        visibility: visible;
+    }
 }
