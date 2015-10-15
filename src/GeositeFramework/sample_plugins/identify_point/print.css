@@ -2,8 +2,8 @@
     #sample-graphic-print {
         visibility: visible;
         position: absolute;
-        left: 500px;
-        top: 10px;
+        top: 510px;
+        -webkit-transform: rotate(45deg);
     }    
 
     #plugin-print-preview-map {

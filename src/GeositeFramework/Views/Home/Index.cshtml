@@ -445,9 +445,14 @@
 
     <script type="text/template" id="template-map-preview">
         <div id="plugin-print-preview">
-            <h3><%= pluginName %> Print Preview</h3>
-            <div id="plugin-print-preview-map"></div>
-            <button id="print-preview-print" class="button radius">Print</button>
+            <div class="popover popover-header">
+                <h2><%= pluginName %> - Print Preview</h2>
+            </div>
+            <div class="print-preview-container">
+                <button id="print-preview-print" class="button radius">Print</button>
+                <p class="instructions">Zoom to the view that you want printed in your map.</p>
+                <div id="plugin-print-preview-map"></div>
+            </div>
         </div>
     </script>
 
@@ -471,9 +476,6 @@
     </div>
     
     @Html.Partial("TourInfo")
-    
-    <!-- Area to hold print preview map elements -->
-    <div id="print-preview-sandbox"></div>
     
     <!-- Area for plugins to arrange their markup independent
         of their container -->

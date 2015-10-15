@@ -1,10 +1,16 @@
 ﻿@media print {
     /* Hide all body an map elements and print preview map controls */
     body,
-    #plugin-print-preview-map_zoom_slider { 
+    #plugin-print-preview-map_zoom_slider {
         visibility: hidden;
     }
 
+
+    /* An issue in Chrome for Windows would display the borders of this
+       element in print media, despite it being selected by the clause above.*/
+    .plugin-launcher {
+        display: none; 
+    }
 
     /* Override the map tiles which have inline styles.
        This avoids having to have an !important on the broader
