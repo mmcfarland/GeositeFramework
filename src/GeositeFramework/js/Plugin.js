@@ -59,6 +59,7 @@ require(['use!Geosite',
                 });
             } catch (e) {
                 // Prevent the malfunctioning plugin from stopping the rest of the code execution
+                console.error(e.stack);
                 console.error(e);
             }
         }
