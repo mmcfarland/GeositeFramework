@@ -4,11 +4,17 @@
 require(['use!Geosite',
          'framework/Legend',
          'framework/util/ajax',
+         'esri/layers/ArcGISTiledMapServiceLayer',
+         'esri/geometry/Extent',
+         'esri/SpatialReference',
          'esri/map'
         ],
     function(N,
              Legend,
              ajaxUtil,
+             ArcGISTiledMapServiceLayer,
+             Extent,
+             SpatialReference,
              Map) {
     'use strict';
 
